@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14110e">
+<title>걱정 저울</title>
+<meta name="description" content="이 걱정은 정말 필요할까? 걱정을 저울에 달아 대비할 걱정과 내려놓을 걱정을 나누는 앱. 에니어그램 6번(충성가) 이야기로 만든 걱정 저울·용기 계기판·기댈 곳 지도">
+<style>
+:root{--bg:#14110e;--card:#1f1a15;--card2:#2a231c;--fg:#f4eee6;--mut:#b9ab99;--line:#43382c;
+--brown:#a87b4f;--deer:#d9a46b;--water:#4fb0b8;--ok:#8fd694;--bad:#ff8a7a;--gold:#f0c35a}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:12px 14px 40px}
+h1{font-size:1.2rem;margin:6px 0}
+h1 small{display:block;font-size:.76rem;color:var(--mut);font-weight:400}
+.tabs{display:flex;gap:5px;margin:10px 0}
+.tabs button{flex:1;padding:9px 2px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:10px;font-size:.84rem;font-weight:600}
+.tabs button.on{background:#4a3624;color:#fff;border-color:#a87b4f}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+h2{font-size:1rem;margin:2px 0 8px}
+.note{font-size:.86rem;color:var(--mut);margin:8px 0 0}
+.note b{color:var(--fg)}
+.btn{padding:12px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,#8a5d33,#d9a46b);color:#1a120a;font-weight:800;font-size:.95rem;flex:1}
+.btn.sec{background:var(--card2);border:1px solid var(--line);color:var(--fg);font-weight:700}
+.btn.sm{flex:none;padding:7px 11px;font-size:.82rem}
+.btn:disabled{opacity:.45}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text]{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:1rem;font-family:inherit}
+label.f{display:block;font-size:.86rem;color:var(--mut);margin:12px 0 4px}
+label.f b{color:var(--fg)}
+input[type=range]{width:100%;accent-color:var(--deer)}
+.scale-l{display:flex;justify-content:space-between;font-size:.72rem;color:var(--mut)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;padding:10px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.85rem}
+.seg button.on{border-color:var(--deer);background:#4a3624}
+canvas{display:block;width:100%;border-radius:14px;background:radial-gradient(circle at 50% 10%,#2c241c,#16120e)}
+.res{margin-top:12px;border-radius:14px;padding:14px;border:1px solid var(--line)}
+.res h3{margin:0 0 6px;font-size:1.05rem}
+.res p{margin:4px 0;font-size:.92rem}
+.wlist{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.w{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.w .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.w .t{font-weight:700;font-size:.93rem;word-break:break-all}
+.w .m{font-size:.76rem;color:var(--mut);margin-top:2px}
+.w .tag{font-size:.72rem;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.w .plan{font-size:.82rem;color:var(--ok);margin-top:4px}
+.w .ask{display:flex;gap:6px;margin-top:8px;align-items:center;font-size:.8rem;color:var(--mut)}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.st{background:var(--card2);border-radius:10px;padding:8px;text-align:center}
+.st .t{font-size:.72rem;color:var(--mut)}
+.st .v{font-size:1.15rem;font-weight:800;font-variant-numeric:tabular-nums}
+/* check */
+.prog{font-size:.8rem;color:var(--mut)}
+.pbar{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;margin:6px 0 12px}
+.pbar div{height:100%;background:linear-gradient(90deg,#8a5d33,#4fb0b8);transition:width .25s}
+.qtext{font-size:1.05rem;font-weight:600;min-height:3.2em;margin:4px 0 12px}
+.likert{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.likert button{padding:12px 0 8px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:1.05rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:2px}
+.likert button span{font-size:.62rem;color:var(--mut);font-weight:400}
+.likert button.sel{border-color:var(--deer);background:#4a3624}
+.bars{display:flex;flex-direction:column;gap:12px;margin:6px 0}
+.bb .bl{display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:4px}
+.bb .bt{height:14px;border-radius:7px;background:var(--card2);overflow:hidden}
+.bb .bt div{height:100%;border-radius:7px;width:0;transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.verdict{text-align:center;font-size:1.3rem;font-weight:800;margin:12px 0 2px}
+.vsub{text-align:center;color:var(--mut);font-size:.9rem}
+.rx{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.rx div{background:var(--card2);border-radius:10px;padding:10px 12px;font-size:.92rem;border-left:3px solid var(--gold)}
+.ringbtns{display:flex;gap:6px;margin-top:10px}
+.ringbtns button{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.8rem}
+.ringbtns button.on{border-color:var(--water);background:#173a3d}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.info h3{font-size:.98rem;margin:14px 0 4px;color:#f1d6b5}
+.info p{margin:4px 0;font-size:.92rem}
+.info ul{margin:4px 0;padding-left:20px;font-size:.92rem}
+.tagc{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.tagc span{font-size:.8rem;padding:3px 9px;border-radius:999px;background:#4a3624;border:1px solid #7a5a3a}
+.arrow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;text-align:center;font-size:.88rem;margin:6px 0}
+.arrow .box{background:var(--card2);border-radius:10px;padding:8px}
+a{color:#f1c58f}
+footer{text-align:center;color:var(--mut);font-size:.78rem;margin-top:18px}
+footer a{color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>⚖️ 걱정 저울<small>이 걱정은 정말 필요할까? — 구더기 무서워 장 못 담글까</small></h1>
+<div class="tabs">
+  <button class="on" data-tab="scale">걱정 달기</button>
+  <button data-tab="check">용기 계기판</button>
+  <button data-tab="map">기댈 곳 지도</button>
+  <button data-tab="info">6번 한눈에</button>
+</div>
+
+<!-- ===== 걱정 달기 ===== -->
+<section id="tab-scale">
+  <div class="card">
+    <canvas id="sc" width="600" height="230"></canvas>
+    <label class="f" for="wText">① 지금 마음에 걸리는 걱정</label>
+    <input type="text" id="wText" maxlength="60" placeholder="예: 다음 주 발표에서 말이 막히면 어쩌지">
+    <label class="f">② 실제로 일어날 것 같은 정도 <b id="pV">30%</b></label>
+    <input type="range" id="pR" min="0" max="100" step="5" value="30"><div class="scale-l"><span>거의 없음</span><span>반반</span><span>거의 확실</span></div>
+    <label class="f">③ 일어난다면 얼마나 큰 일일까 <b id="sV">보통</b></label>
+    <input type="range" id="sR" min="1" max="5" value="3"><div class="scale-l"><span>조금 불편</span><span>꽤 곤란</span><span>매우 심각</span></div>
+    <label class="f">④ 지금 내가 할 수 있는 것이 있나</label>
+    <div class="seg" id="ctl"><button data-v="y">있다</button><button data-v="s">조금</button><button data-v="n">없다</button></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="wGo">저울에 달기</button></div>
+    <div id="wRes"></div>
+  </div>
+  <div class="card">
+    <h2>📦 걱정 상자 — 다시 보면 어땠을까</h2>
+    <div class="stat"><div class="st"><div class="t">달아 본 걱정</div><div class="v" id="stN">0</div></div><div class="st"><div class="t">결과 확인</div><div class="v" id="stC">0</div></div><div class="st"><div class="t">실제로 일어남</div><div class="v" id="stH" style="color:#f0c35a">-</div></div></div>
+    <div class="wlist" id="wList"></div>
+    <p class="note">시간이 지난 뒤 "실제로 일어났나요?"에 답해 보세요. 걱정한 것 중 실제로 일어난 비율을 눈으로 보면, 다음 걱정의 무게가 달라집니다. 기록은 이 기기에만 저장됩니다.</p>
+  </div>
+</section>
+
+<!-- ===== 용기 계기판 ===== -->
+<section id="tab-check" hidden>
+  <div class="card" id="kIntro">
+    <h2>🦌 나의 용기 계기판</h2>
+    <p style="margin:0">문장 12개를 읽고, 요즘의 나와 얼마나 비슷한지 1~5로 눌러 주세요.</p>
+    <p class="note">세 가지를 봅니다 — <b>신중</b>(돌다리도 두들겨 보는 힘), <b>걱정</b>(기우·겁), <b>용기</b>(믿고 한 걸음 나아가기). 유형 진단이 아니라 누구나 해 볼 수 있는 "걱정 습관" 점검입니다.</p>
+    <div class="row" style="margin-top:12px"><button class="btn" id="kStart">시작하기</button></div>
+    <p class="note" id="kLast"></p>
+  </div>
+  <div class="card" id="kQ" hidden>
+    <div class="prog" id="kProg"></div>
+    <div class="pbar"><div id="kBar"></div></div>
+    <div class="qtext" id="kText"></div>
+    <div class="likert" id="kLik"></div>
+    <div class="row" style="margin-top:12px"><button class="btn sec" id="kBack">← 이전</button></div>
+  </div>
+  <div class="card" id="kRes" hidden>
+    <div class="bars" id="kBars"></div>
+    <div class="verdict" id="vTitle"></div>
+    <div class="vsub" id="vSub"></div>
+    <div class="rx" id="rx"></div>
+    <div class="row" style="margin-top:14px"><button class="btn sec" id="kShare">결과 복사</button><button class="btn" id="kAgain">다시 재기</button></div>
+    <p class="note">이 점검은 성찰을 돕는 참고용이며 심리검사나 전문 상담을 대신하지 않습니다. 걱정과 불안이 일상을 오래 흔든다면 전문가와 꼭 이야기해 보세요. 내 에니어그램 유형이 궁금하다면 <a href="https://woojuntaek-lgtm.github.io/enneagram-quick/" target="_blank" rel="noopener">에니어그램 빠른 체크</a>를 해 보세요.</p>
+  </div>
+</section>
+
+<!-- ===== 기댈 곳 지도 ===== -->
+<section id="tab-map" hidden>
+  <div class="card">
+    <h2>🏡 기댈 곳 지도</h2>
+    <p class="note" style="margin-top:0">6번이 가장 두려워하는 것은 <b>기댈 곳 없이 홀로 남겨지는 것</b>입니다. 그런데 막상 적어 보면, 나를 받쳐 주는 곳은 생각보다 많습니다. 가까운 원부터 채워 보세요.</p>
+    <canvas id="mc" width="600" height="600" style="margin-top:8px;background:radial-gradient(circle,#1f2c2d,#14110e)"></canvas>
+    <div class="ringbtns" id="rings"><button data-r="0" class="on">💛 가장 가까운</button><button data-r="1">🤝 믿을 만한</button><button data-r="2">🏛️ 기관·제도</button></div>
+    <div class="row" style="margin-top:8px;flex-wrap:nowrap"><input type="text" id="pName" maxlength="14" placeholder="이름이나 별명 (예: 언니, 김 선배, 동네 의원)"><button class="btn sm" id="pAdd" style="padding:11px 14px">추가</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn sec sm" id="pUndo">↶ 마지막 지우기</button><button class="btn sec sm" id="pClear">모두 지우기</button></div>
+    <p class="note" id="mNote"></p>
+    <p class="note">기관·제도 예: 동네 의원, 주민센터, 상담센터, 정신건강 위기상담 <b>☎ 1577-0199</b>(24시간). 지도는 이 기기에만 저장됩니다.</p>
+  </div>
+</section>
+
+<!-- ===== 6번 한눈에 ===== -->
+<section id="tab-info" hidden>
+  <div class="card info">
+    <h2>🦌 에니어그램 6번 · 충성가</h2>
+    <p><b>믿을 수 있는 곳을 찾는 사람.</b> "꺼진 불도 다시 보자. 돌다리도 두들겨 보고 건넌다." 머리로 먼저 위험을 살피는 유형입니다.</p>
+    <div class="tagc"><span>사고형(머리 중심) 5·6·7</span><span>순응형 — 관계를 이어 감</span><span>미덕: 용기</span><span>악덕: 겁</span><span>상징: 사슴·브라운</span></div>
+    <h3>사고형 안에서의 자리</h3>
+    <p>머리 중심인 5·6·7번 가운데, 겉으로는 <b>호감형이지만 실은 냉정한</b> 유형입니다.</p>
+    <h3>동양 수리로 보면 — 스며드는 물(水)</h3>
+    <p>숫자 6은 음의 물(水). <b>1(水)과 5(土)의 합</b>으로, 감싸 안고 스며드는 <b>차분한 습기</b> 같은 기운입니다.</p>
+    <h3>충성의 결</h3>
+    <p>바깥의 <b>멘토와 이상</b>을 따르는 충성. 상징 동물은 사슴, 색은 브라운입니다.</p>
+    <h3>두려움과 바람</h3>
+    <p>가장 두려운 것은 <b>기댈 곳 없이 홀로 남겨지는 것</b>. 그 불안이 일탈이나 투사로 나타나기도 합니다.</p>
+    <h3>관계를 이어 가는 순응형</h3>
+    <p>관계를 어떻게든 이어 가려 하고, <b>시간 엄수는 절대 권위</b>처럼 지킵니다.</p>
+    <h3>같은 마음, 두 얼굴</h3>
+    <div class="arrow"><div class="box">🦁 용기<br><small>신념을 위해 끝까지 책임지는 든든함</small></div><div>↔</div><div class="box">🌧️ 겁<br><small>기인지우(杞人之憂) — 하늘이 무너질까 하는 걱정</small></div></div>
+    <p><b>구더기 무서워 장 못 담글까.</b> 이 걱정은 정말 필요한지 한 번 물어보는 것이 시작입니다.</p>
+    <h3>날개</h3>
+    <ul><li><b>6w5</b> — 5번 쪽 날개, 신중하고 분석적인 쪽</li><li><b>6w7</b> — 7번 쪽 날개, 밝고 사교적인 쪽</li></ul>
+    <h3>스트레스와 성장</h3>
+    <div class="arrow"><div class="box">스트레스 → <b>3번처럼</b><br><small>불안을 덮으려 일과 성과로 내달림</small></div><div>·</div><div class="box">성장 → <b>9번처럼</b><br><small>마음이 놓이고 편안하게 받아들임</small></div></div>
+    <h3>6번과 잘 지내려면</h3>
+    <ul><li>약속과 시간을 <b>지켜</b> 주세요 — 신뢰의 기본입니다.</li><li>걱정을 가볍게 넘기기보다 <b>함께 따져 봐</b> 주세요.</li><li>"내가 옆에 있다"는 것을 <b>말로</b> 확인시켜 주세요.</li></ul>
+    <p class="note">6번으로 추정되는 인물과 "불안에 휩싸인 6번에게 건네는 말"은 영상에서 확인해 주세요.</p>
+    <p class="note" style="text-align:center;margin-top:14px">유형은 사람을 가두는 상자가 아니라 지금 서 있는 곳을 알려 주는 지도입니다.</p>
+  </div>
+</section>
+
+<footer>© 2026 정필 수심명 · <a href="https://blog.naver.com/omyman" target="_blank" rel="noopener">blog.naver.com/omyman</a><br>「에니어그램 6번 충성가」 부록 [Psyche 08] · 인터넷 없이 동작</footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const URL_='https://woojuntaek-lgtm.github.io/worry-scale/';
+const store={get(k,d){try{const v=localStorage.getItem('worry_'+k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem('worry_'+k,JSON.stringify(v));}catch(e){}}};
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),1800);}
+async function copy(t){try{await navigator.clipboard.writeText(t);toast('복사했습니다');}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('복사했습니다');}catch(_){toast('복사에 실패했습니다');}a.remove();}}
+const vib=n=>{try{navigator.vibrate&&navigator.vibrate(n);}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function prep(cv,ratio){const dpr=Math.min(2,window.devicePixelRatio||1),w=cv.clientWidth||360,h=Math.round(w*ratio);
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';}
+  const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return {c,w,h};}
+function T(c,s,x,y,col,size,al,bl,wt){c.fillStyle=col;c.font=`${wt||''} ${size||12}px -apple-system,"Malgun Gothic",sans-serif`;c.textAlign=al||'center';c.textBaseline=bl||'middle';c.fillText(s,x,y);}
+
+/* ===== 걱정 저울 ===== */
+const SZ=['','조금 불편','불편','꽤 곤란','심각','매우 심각'];
+let p=30,sz=3,ctl='',tilt=0,tiltT=0,list=store.get('list',[]);
+$('#pR').oninput=e=>{p=+e.target.value;$('#pV').textContent=p+'%';};
+$('#sR').oninput=e=>{sz=+e.target.value;$('#sV').textContent=SZ[sz];};
+$$('#ctl button').forEach(b=>b.onclick=()=>{ctl=b.dataset.v;$$('#ctl button').forEach(x=>x.classList.toggle('on',x===b));});
+function weigh(p,sz,ctl){const w=p/100*sz; // 0~5
+  if(w>=1.2&&ctl!=='n') return {k:'prep',w,t:'🛡️ 대비할 걱정',c:'#8fd694',d:'일어날 가능성도, 크기도 있는 걱정입니다. 걱정을 <b>준비로 바꾸면</b> 무게가 줄어듭니다. 지금 할 수 있는 한 가지를 적어 보세요.'};
+  if(w>=1.2&&ctl==='n') return {k:'share',w,t:'🤝 함께 나눌 걱정',c:'#4fb0b8',d:'무게는 있는데 혼자 할 수 있는 것이 없습니다. 이럴 때는 <b>기댈 곳</b>과 나누세요. 믿을 만한 사람이나 전문가·제도의 도움이 길입니다.'};
+  if(w<1.2&&p<=20) return {k:'sky',w,t:'🌫️ 기인지우(杞人之憂)',c:'#f0c35a',d:'하늘이 무너질까 걱정하던 기나라 사람처럼, 일어날 가능성이 낮은 걱정입니다. <b>구더기 무서워 장 못 담글까</b> — 오늘은 내려놓아도 괜찮습니다.'};
+  return {k:'watch',w,t:'👀 지켜볼 걱정',c:'#d9a46b',d:'지금 당장 무겁지는 않습니다. 날짜를 정해 <b>그때 한 번만 다시 확인</b>하고, 그 전까지는 마음 한쪽에 접어 두세요.'};}
+$('#wGo').onclick=()=>{const t=$('#wText').value.trim();if(!t){toast('걱정을 한 줄로 적어 주세요');return;}if(!ctl){toast('④ 할 수 있는 것이 있는지 골라 주세요');return;}
+  const r=weigh(p,sz,ctl);tilt=Math.min(1,r.w/3);tiltT=0;vib(15);
+  $('#wRes').innerHTML=`<div class="res" style="border-color:${r.c}"><h3 style="color:${r.c}">${r.t}</h3><p>${r.d}</p>
+   <p style="font-size:.82rem;color:var(--mut)">걱정의 무게 = 가능성 ${p}% × 크기 ${sz} = <b style="color:${r.c}">${r.w.toFixed(2)}</b> / 5</p>
+   ${r.k==='prep'||r.k==='share'?`<input type="text" id="planIn" maxlength="50" placeholder="${r.k==='prep'?'지금 할 수 있는 한 가지 (예: 발표 첫 문장만 외워 두기)':'누구와 나눌까 (예: 팀장님께 미리 말하기)'}" style="margin-top:8px">`:''}
+   <div class="row" style="margin-top:10px"><button class="btn" id="wSave">${r.k==='sky'?'🌬️ 내려놓고 상자에 넣기':'걱정 상자에 넣기'}</button></div></div>`;
+  $('#wSave').onclick=()=>{const plan=($('#planIn')||{}).value||'';const d=new Date();
+    list.unshift({t,p,sz,ctl,k:r.k,w:+r.w.toFixed(2),plan:plan.trim(),d:`${d.getMonth()+1}/${d.getDate()}`,ts:Date.now(),h:null});store.set('list',list);
+    $('#wRes').innerHTML='';$('#wText').value='';ctl='';$$('#ctl button').forEach(x=>x.classList.remove('on'));
+    if(r.k==='sky'){flyAway=1;flyT=0;}renderList();toast(r.k==='sky'?'걱정 하나를 바람에 날려 보냈습니다':'걱정 상자에 넣었습니다');};
+};
+const KT={prep:['🛡️ 대비','#8fd694'],share:['🤝 나눔','#4fb0b8'],sky:['🌫️ 기인지우','#f0c35a'],watch:['👀 지켜봄','#d9a46b']};
+function renderList(){const n=list.length,checked=list.filter(x=>x.h!==null),hap=checked.filter(x=>x.h===true).length;
+  $('#stN').textContent=n;$('#stC').textContent=checked.length;$('#stH').textContent=checked.length?Math.round(hap/checked.length*100)+'%':'-';
+  if(!n){$('#wList').innerHTML='<div class="note" style="text-align:center">아직 달아 본 걱정이 없습니다.</div>';return;}
+  $('#wList').innerHTML=list.map((x,i)=>{const k=KT[x.k];return `<div class="w"><div class="top"><div><div class="t">${esc(x.t)}</div><div class="m">${x.d} · 가능성 ${x.p}% · 크기 ${x.sz} · 무게 ${x.w}</div></div><span class="tag" style="background:${k[1]}22;color:${k[1]};border:1px solid ${k[1]}">${k[0]}</span></div>
+   ${x.plan?`<div class="plan">→ ${esc(x.plan)}</div>`:''}
+   ${x.h===null?`<div class="ask">실제로 일어났나요? <button class="btn sec sm" data-h="${i}" data-v="1">일어났다</button><button class="btn sec sm" data-h="${i}" data-v="0">안 일어났다</button><button class="btn sec sm" data-del="${i}">✕</button></div>`:
+     `<div class="ask">${x.h?'⚡ 실제로 일어났음':'🌤️ 일어나지 않았음'} <button class="btn sec sm" data-del="${i}">✕</button></div>`}</div>`;}).join('');
+  $$('[data-h]').forEach(b=>b.onclick=()=>{const x=list[+b.dataset.h];x.h=b.dataset.v==='1';store.set('list',list);renderList();
+    toast(x.h?'일어났군요. 그래도 미리 달아 본 덕분에 대비할 수 있었을 거예요':'걱정했던 일은 일어나지 않았습니다 🌤️');});
+  $$('[data-del]').forEach(b=>b.onclick=()=>{list.splice(+b.dataset.del,1);store.set('list',list);renderList();});}
+renderList();
+let flyAway=0,flyT=0,lt=0;
+function drawScale(ts){const dt=lt?Math.min(.05,(ts-lt)/1000):0;lt=ts;
+  if(!$('#tab-scale').hidden){
+  const {c,w,h}=prep($('#sc'),0.38);c.clearRect(0,0,w,h);tiltT=Math.min(1,tiltT+dt*1.5);
+  const live=$('#wRes').innerHTML?tilt:Math.min(1,(p/100*sz)/3);const ang=(0.35*live-0.1)*(tiltT<1?Math.sin(tiltT*Math.PI*2.5)*(1-tiltT)+1:1);
+  const cx=w/2,top=h*0.22,L=w*0.34;
+  c.fillStyle='#6b4d31';c.fillRect(cx-5,top,10,h*0.62);c.fillRect(cx-40,h*0.84,80,8);
+  const lx=cx-L*Math.cos(ang),ly=top-L*Math.sin(ang)*-1,rx=cx+L*Math.cos(ang),ry=top-L*Math.sin(ang);
+  c.strokeStyle='#d9a46b';c.lineWidth=5;c.beginPath();c.moveTo(lx,top+L*Math.sin(ang));c.lineTo(rx,top-L*Math.sin(ang));c.stroke();
+  c.beginPath();c.arc(cx,top,7,0,7);c.fillStyle='#f0c35a';c.fill();
+  const pan=(x,y,lab,emo,col)=>{c.strokeStyle='rgba(217,164,107,.6)';c.lineWidth=1.5;c.beginPath();c.moveTo(x,y);c.lineTo(x-36,y+40);c.moveTo(x,y);c.lineTo(x+36,y+40);c.stroke();
+    c.fillStyle=col;c.beginPath();c.ellipse(x,y+42,44,9,0,0,7);c.fill();T(c,emo,x,y+28,'#fff',22);T(c,lab,x,y+64,'#b9ab99',11);};
+  pan(cx-L*Math.cos(ang),top+L*Math.sin(ang),'걱정의 무게','🪨','#4a3624');
+  pan(cx+L*Math.cos(ang),top-L*Math.sin(ang),'지금 할 수 있는 것','🌱','#2c4a3a');
+  if(flyAway){flyT+=dt;const k=Math.min(1,flyT/1.6);T(c,'🍃',cx-L+k*w*0.9,top+20-k*h*0.5+Math.sin(k*12)*8,'#fff',20+6*(1-k));if(k>=1)flyAway=0;}}
+  requestAnimationFrame(drawScale);}
+requestAnimationFrame(drawScale);
+
+/* ===== 용기 계기판 ===== */
+const Q=[
+ ['C','중요한 결정 전에는 여러 번 확인하고 점검한다.'],
+ ['W','일어나지도 않은 일을 미리 걱정하느라 잠을 설친 적이 있다.'],
+ ['B','두려워도 해야 할 일이면 한 걸음 내디딘다.'],
+ ['C','약속 시간과 규칙을 철저히 지키는 편이다.'],
+ ['W','"혹시 잘못되면 어쩌지?"라는 생각이 자주 든다.'],
+ ['B','믿는 사람에게 도움을 청하는 것이 어렵지 않다.'],
+ ['C','새로운 일은 최악의 경우부터 떠올리며 대비한다.'],
+ ['W','다른 사람의 말 속뜻을 의심하며 곱씹을 때가 있다.'],
+ ['B','결과가 확실하지 않아도 내 판단을 믿고 움직일 수 있다.'],
+ ['C','믿을 만한 사람이나 조직에 끝까지 충실하다.'],
+ ['W','걱정이 많아 시작을 미루거나 포기한 일이 있다.'],
+ ['B','불안할 때 몸과 마음을 가라앉히는 나만의 방법이 있다.']
+];
+const LAB=['전혀\n아니다','아니다','보통','그렇다','매우\n그렇다'];
+let ki=0,ans=[];
+function kShow(){$('#kProg').textContent=`${ki+1} / ${Q.length}`;$('#kBar').style.width=(ki/Q.length*100)+'%';$('#kText').textContent=Q[ki][1];
+  $('#kLik').innerHTML=LAB.map((l,k)=>`<button data-v="${k+1}" class="${ans[ki]===k+1?'sel':''}">${k+1}<span>${l.replace('\n','<br>')}</span></button>`).join('');
+  $$('#kLik button').forEach(b=>b.onclick=()=>{ans[ki]=+b.dataset.v;b.classList.add('sel');vib(10);setTimeout(()=>{if(ki<Q.length-1){ki++;kShow();}else kResult();},160);});
+  $('#kBack').disabled=ki===0;}
+const score=dim=>{let s=0,n=0;Q.forEach((q,i)=>{if(q[0]===dim){s+=ans[i]-1;n++;}});return Math.round(s/(4*n)*100);};
+function verdict(C,W,B){
+  if(W>=60&&W>=B) return {t:'🌧️ 기우 주의보',s:'걱정이 앞질러 달려 나가는 때 — 하늘이 무너질까 하는 걱정이 커졌습니다',c:'#ff8a7a'};
+  if(C>=55&&B>=55) return {t:'🦌 든든한 사슴',s:'돌다리를 두들기되 건너는 사람 — 신중함과 용기가 함께합니다',c:'#8fd694'};
+  if(C>=55) return {t:'🧱 돌다리만 두들기는 중',s:'준비와 점검은 충분합니다. 이제 건너 볼 차례',c:'#f0c35a'};
+  if(B>=55) return {t:'🌊 스며드는 물',s:'걱정에 크게 휘둘리지 않고 흐름을 타는 중',c:'#4fb0b8'};
+  return {t:'🍂 잠시 지친 마음',s:'걱정도 용기도 쉬어 가는 때 — 기댈 곳을 먼저 떠올려 보세요',c:'#b9ab99'};}
+function rxList(C,W,B){const r=[];
+  if(W>=50) r.push('<b>이 걱정은 정말 필요할까?</b> "걱정 달기" 탭에서 가능성과 크기를 숫자로 달아 보세요. 막연한 걱정은 숫자 앞에서 가벼워집니다.');
+  if(W>=50) r.push('<b>구더기 무서워 장 못 담글까.</b> 걱정 상자에 넣은 일 중 실제로 일어난 비율을 기록해 보세요.');
+  if(B<55) r.push('<b>두려움이 있어도 한 걸음.</b> 용기는 두려움이 없는 것이 아니라 두려움을 안고 가는 것 — 6번의 미덕입니다.');
+  if(C>=55&&B<55) r.push('<b>점검은 이미 충분합니다.</b> 확인을 한 번 줄이고 그 시간에 한 걸음 내디뎌 보세요.');
+  if(C>=55&&W<50&&B>=55) r.push('<b>지금 그대로 좋습니다.</b> 신중함과 용기가 함께하는 든든한 상태입니다.');
+  r.push('<b>혼자가 아닙니다.</b> "기댈 곳 지도"에 나를 받쳐 주는 사람과 곳을 적어 보세요. 마음이 놓일 때 6번은 9번처럼 편안해집니다.');
+  return r.slice(0,4);}
+function kResult(){const C=score('C'),W=score('W'),B=score('B'),v=verdict(C,W,B);
+  $('#kQ').hidden=true;$('#kRes').hidden=false;
+  $('#kBars').innerHTML=[['신중 · 돌다리도 두들겨 보기',C,'#d9a46b'],['걱정 · 기우와 겁',W,'#ff8a7a'],['용기 · 믿고 나아가기',B,'#8fd694']].map(([l,v,c])=>`<div class="bb"><div class="bl"><span>${l}</span><b style="color:${c}">${v}</b></div><div class="bt"><div style="background:${c}" data-w="${v}"></div></div></div>`).join('');
+  requestAnimationFrame(()=>requestAnimationFrame(()=>$$('#kBars .bt div').forEach(d=>d.style.width=d.dataset.w+'%')));
+  $('#vTitle').textContent=v.t;$('#vTitle').style.color=v.c;$('#vSub').textContent=v.s;
+  $('#rx').innerHTML=rxList(C,W,B).map(t=>`<div>${t}</div>`).join('');
+  store.set('klast',{C,W,B,t:v.t,d:new Date().toLocaleDateString('ko-KR')});
+  $('#kShare').onclick=()=>copy(`[걱정 저울 · 용기 계기판] ${v.t}\n신중 ${C} · 걱정 ${W} · 용기 ${B}\n${v.s}\n${URL_}`);window.scrollTo(0,0);}
+$('#kStart').onclick=()=>{ki=0;ans=[];$('#kIntro').hidden=true;$('#kQ').hidden=false;kShow();};
+$('#kBack').onclick=()=>{if(ki>0){ki--;kShow();}};
+$('#kAgain').onclick=()=>{$('#kRes').hidden=true;$('#kIntro').hidden=false;kLast();};
+function kLast(){const l=store.get('klast',null);$('#kLast').textContent=l?`지난번(${l.d}): ${l.t} · 신중 ${l.C} 걱정 ${l.W} 용기 ${l.B}`:'';}
+kLast();
+
+/* ===== 기댈 곳 지도 ===== */
+let ring=0,people=store.get('people',[]);
+const RC=['#f0c35a','#4fb0b8','#a87b4f'],RN=['가장 가까운','믿을 만한','기관·제도'];
+$$('#rings button').forEach(b=>b.onclick=()=>{ring=+b.dataset.r;$$('#rings button').forEach(x=>x.classList.toggle('on',x===b));});
+$('#pAdd').onclick=()=>{const n=$('#pName').value.trim();if(!n){toast('이름이나 별명을 적어 주세요');return;}people.push({n,r:ring});store.set('people',people);$('#pName').value='';drawMap();vib(10);};
+$('#pName').addEventListener('keydown',e=>{if(e.key==='Enter')$('#pAdd').click();});
+$('#pUndo').onclick=()=>{people.pop();store.set('people',people);drawMap();};
+$('#pClear').onclick=()=>{if(!people.length)return;people=[];store.set('people',people);drawMap();};
+function drawMap(){const {c,w,h}=prep($('#mc'),1);c.clearRect(0,0,w,h);const cx=w/2,cy=h/2,R=[w*0.2,w*0.33,w*0.46];
+  for(let k=2;k>=0;k--){c.beginPath();c.arc(cx,cy,R[k],0,7);c.fillStyle=RC[k]+(k===0?'22':'14');c.fill();c.strokeStyle=RC[k]+'88';c.lineWidth=1.5;c.stroke();}
+  T(c,'🦌',cx,cy-6,'#fff',30);T(c,'나',cx,cy+22,'#f4eee6',12,'center','middle','bold');
+  [0,1,2].forEach(k=>{const ps=people.filter(p=>p.r===k);const inner=k?R[k-1]:w*0.08,rr=(inner+R[k])/2;
+    T(c,RN[k],cx,cy-R[k]+10,RC[k],10);
+    ps.forEach((p,i)=>{const a=-Math.PI/2+(i+0.5)/Math.max(ps.length,1)*Math.PI*2+k*0.4;const x=cx+rr*Math.cos(a),y=cy+rr*Math.sin(a);
+      c.font='bold 12px -apple-system,"Malgun Gothic",sans-serif';const tw=c.measureText(p.n).width+14;
+      c.fillStyle='#1f1a15';c.strokeStyle=RC[k];c.lineWidth=1.5;c.beginPath();if(c.roundRect)c.roundRect(x-tw/2,y-12,tw,24,12);else c.rect(x-tw/2,y-12,tw,24);c.fill();c.stroke();T(c,p.n,x,y,'#f4eee6',12,'center','middle','bold');});});
+  const n=people.length;
+  $('#mNote').innerHTML=!n?'아직 비어 있습니다. 가장 가까운 사람 한 명부터 적어 보세요.':`나를 받쳐 주는 곳이 <b>${n}곳</b> 있습니다. 홀로 남겨진 것 같은 날, 이 지도를 다시 열어 보세요. 이 중 한 곳에 오늘 안부를 전해 보는 것도 좋습니다.`;}
+
+/* ===== 탭 ===== */
+$$('.tabs button').forEach(b=>b.onclick=()=>{$$('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  ['scale','check','map','info'].forEach(t=>$('#tab-'+t).hidden=t!==b.dataset.tab);if(b.dataset.tab==='map')drawMap();window.scrollTo(0,0);});
+window.addEventListener('resize',()=>{if(!$('#tab-map').hidden)drawMap();});
+})();
+</script>
+</body>
+</html>
